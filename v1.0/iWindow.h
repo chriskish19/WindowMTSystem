@@ -545,7 +545,7 @@ namespace WMTS {
 			ShowWindow(hwnd, SW_SHOWDEFAULT);
 		}
 
-		LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+		LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) override{
 			switch (message)
 			{
 			case WM_KEYDOWN: {
@@ -642,7 +642,7 @@ namespace WMTS {
 			thread_mp.emplace(mainThreadID, GetHandle());
 
 			// build thread pool
-			for (size_t i{}, j{1}; i < NumberOfWindows; i++,j++) {
+			for (size_t i{}; i < NumberOfWindows; i++) {
 				thread_pool.emplace_back(new std::thread(&WMTS::MTPlainWin32Window::Run, this));
 			}
 
@@ -664,8 +664,12 @@ namespace WMTS {
 			
 		}
 
-	
+		
 		void RunLogic(std::thread::id CurrentThreadID,std::shared_ptr<std::atomic<bool>> run) {
+			// Example code for showing functionality:
+			// Put any logic code here: 
+			
+
 			// for std::format printing in the window title
 			int x = 0;
 			
