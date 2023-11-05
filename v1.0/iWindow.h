@@ -429,6 +429,9 @@ namespace WMTS {
 
 		virtual void SetWindowTitle(std::wstring newTitle,HWND WindowHandle) = 0;
 
+		// used in constructor to initialize class
+		virtual void WindowInit() = 0;
+
 		WNDCLASSEXW mWCEX{};
 		std::wstring mWindowClassName;
 	};
@@ -437,28 +440,7 @@ namespace WMTS {
 	class PlainWin32Window :public iWindowClass{
 	public:
 		PlainWin32Window() {
-			// defaults
-			mWindowClassName = L"Win32Window";
-			mWindowTitle = L"PlainWin32Window";
-			
-			mWindowWidthINIT = GetSystemMetrics(SM_CXSCREEN) / 2;
-			mWindowHeightINIT = GetSystemMetrics(SM_CYSCREEN) / 2;
-
-			SetWindowClass();
-			RegisterWindowClass();
-			CreateAWindow();
-		}
-		
-		PlainWin32Window(int width,int height,std::wstring title) {
-			mWindowClassName = L"Win32Window";
-			mWindowTitle = title;
-
-			mWindowWidthINIT = width;
-			mWindowHeightINIT = height;
-
-			SetWindowClass();
-			RegisterWindowClass();
-			CreateAWindow();
+			WindowInit();
 		}
 
 		int ProcessMessage() override {
@@ -476,6 +458,20 @@ namespace WMTS {
 			return (int)msg.wParam;
 		}
 	protected:
+		void WindowInit() override {
+			// defaults
+			mWindowClassName = L"Win32Window";
+			mWindowTitle = L"PlainWin32Window";
+
+			mWindowWidthINIT = GetSystemMetrics(SM_CXSCREEN) / 2;
+			mWindowHeightINIT = GetSystemMetrics(SM_CYSCREEN) / 2;
+
+			SetWindowClass();
+			RegisterWindowClass();
+			CreateAWindow();
+		}
+
+
 		void SetWindowTitle(std::wstring newTitle,HWND WindowHandle) override {
 			SetWindowText(WindowHandle, newTitle.c_str());
 		}

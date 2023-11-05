@@ -8,7 +8,7 @@ Or Clone the repository and use Visual Studio 2022 to compile and run.
 ### Example 1:
 This code creates two windows, each window has its own logic thread and message loop thread. 
 
-```
+```cpp
 #include "iWindow.h"
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow) {
@@ -20,16 +20,29 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
 ### Example 2:
 Create a custom window class with polymorphism:
-```
-class MyCustomWindow: public: WMTS::MTPlainWin32Window{
+```cpp
+class MyCustomWindow: public WMTS::MTPlainWin32Window{
 public:
 	MyCustomWindow(){
-		// initialize members here
-		
-		SetWindowClass();
+		WindowInit();
 	}
 
 private:
+	// override base class WindowInit()
+	void WindowInit() override{
+		// Change these to your preference
+		mWindowClassName = L"Win32Window";
+		mWindowTitle = L"PlainWin32Window";
+
+		mWindowWidthINIT = GetSystemMetrics(SM_CXSCREEN) / 2;
+		mWindowHeightINIT = GetSystemMetrics(SM_CYSCREEN) / 2;
+
+		// must call these functions in this order
+		SetWindowClass();
+		RegisterWindowClass();
+		CreateAWindow();
+	}
+
 	// override the base class
 	void SetWindowClass() override {
 		// initialize the mWCEX structure to your prefered settings	
@@ -41,9 +54,19 @@ private:
 	}
 }
 ```
-To use the custom window class:
+
+Make sure to remove WindowInit() from PlainWin32Window constructor or the progam will fail
+```cpp
+class PlainWin32Window :public iWindowClass{
+public:
+	PlainWin32Window() {
+		WindowInit(); 
+	}
 ```
+To use the custom window class:
+```cpp
 #include "iWindow.h"
+// custom window definition here
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow) {
 	MyCustomWindow Window;
