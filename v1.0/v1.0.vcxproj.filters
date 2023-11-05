@@ -12,6 +12,9 @@
     <Filter Include="MAIN_ENTRY">
       <UniqueIdentifier>{b253a053-ede6-4e0e-ac2c-fba83b613e11}</UniqueIdentifier>
     </Filter>
+    <Filter Include="INFO">
+      <UniqueIdentifier>{f399bd41-abdf-4be1-9464-8c37c7a388c5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -24,6 +27,8 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\README.md" />
+    <None Include="..\README.md">
+      <Filter>INFO</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -695,8 +695,7 @@ namespace WMTS {
 			// messages
 			MSG msg{};
 			
-			// keep program executing
-			bool running{ true };
+			// RunLogic function loop 
 			std::shared_ptr<std::atomic<bool>> run_logic{ std::make_shared<std::atomic<bool>> (true) };
 
 			// get current thread id to use the correct window handle
@@ -705,20 +704,15 @@ namespace WMTS {
 			// put logic on a separete thread
 			std::thread* logic_thread = new std::thread(&WMTS::MTPlainWin32Window::RunLogic, this, CurrentThread, run_logic);
 
-			// Main program loop
-			while (running) {
-				// Windows message loop:
-				while (PeekMessage(&msg, nullptr, 0, 0,PM_REMOVE))
-				{
-					TranslateMessage(&msg);
-					DispatchMessage(&msg);
-					
-					if (msg.message == WM_QUIT) {
-						running = false;
-						*run_logic = false;
-					}
-				}
+			// Windows message loop:
+			while (GetMessage(&msg, nullptr, 0, 0))
+			{
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
 			}
+
+			// exit RunLogic() loop
+			*run_logic = false;
 
 			// join logic thread
 			if(logic_thread->joinable()) 
