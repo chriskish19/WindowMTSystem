@@ -5,7 +5,8 @@ All of the code is defined in iWindow.h. To use include iWindow.h in a cpp file 
 Or Clone the repository and use Visual Studio 2022 to compile and run.
 
 
-### Example 1:
+## How to:
+### In main.cpp
 This code creates two windows, each window has its own logic thread and message loop thread. 
 
 ```cpp
@@ -18,9 +19,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 }
 ```
 
-### Example 2:
+### In a created header file CustomWindow.h:
 Create a custom window class with polymorphism:
 ```cpp
+#include "iWindow.h"
 class MyCustomWindow: public WMTS::MTPlainWin32Window{
 public:
 	MyCustomWindow(){
@@ -65,7 +67,7 @@ public:
 ```
 To use the custom window class:
 ```cpp
-#include "iWindow.h"
+#include "CustomWindow.h"
 // custom window definition here
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow) {
@@ -74,5 +76,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	return 0;
 }
 ```
+## Info:
+#### See Example1 on how to implement dynamically creating windows on separate threads at run time.
+
+
 This is a work in progress, I am still learning how to use C++.  
 For myself I'll to be using it in my game engine with Direct X12 API.
+
