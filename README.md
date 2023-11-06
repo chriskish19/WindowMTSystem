@@ -74,6 +74,5 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	return 0;
 }
 ```
-This is a work in progress, I am still learning how to use C++. 
-I spent my saturday from 9am-12am coding this hopefully it can be useful to someone. 
+This is a work in progress, I am still learning how to use C++.  
 For myself I'll to be using it in my game engine with Direct X12 API.

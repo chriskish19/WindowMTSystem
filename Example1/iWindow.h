@@ -14,6 +14,8 @@
 #include <format>
 #include <chrono>
 #include <atomic>
+#include <mutex>
+#include <condition_variable>
 #include "resource.h"
 
 namespace WMTS {
@@ -635,20 +637,10 @@ namespace WMTS {
 			// for the main thread window
 			ProcessMessage();
 
-			// causes main thread to wait for thread pool to finish executing
-			for (auto thread : thread_pool_mp) {
-				if (thread.second->joinable()) {
-					thread.second->join();
-				}
-			}
-			
-			// clean up thread objects
-			for (auto thread : thread_pool_mp) {
-				if (thread.second) {
-					delete thread.second;
-				}
-			}
-
+			// main thread window is closed now
+			// wait for all threads to finish
+			main_thread_lock = std::unique_lock<std::mutex>(main_thread_guard);
+			main_thread_cv.wait(main_thread_lock, [this] {return thread_pool_mp.empty(); });
 		}
 
 		// fp: function pointer
@@ -656,8 +648,8 @@ namespace WMTS {
 		void BuildThreadPool(size_t NumberOfThreads, auto fp, auto this_obj) {
 			NumberOfThreads = std::clamp(NumberOfThreads, (size_t)0, (size_t)total_threads - 1);
 
-			std::mutex guard;
-			guard.lock();
+			// No need to unlock, as std::lock_guard will unlock automatically
+			std::lock_guard<std::mutex> lock(thread_guard4);
 
 			// build thread pool
 			for (size_t i{}; i < NumberOfThreads && thread_pool_mp.size() < total_threads; i++) {
@@ -665,8 +657,6 @@ namespace WMTS {
 				auto thread = new std::thread(fp, this_obj);
 				thread_pool_mp.emplace(thread->get_id(), thread);
 			}
-
-			guard.unlock();
 		}
 		
 		void RunLogic(std::thread::id CurrentThreadID,std::shared_ptr<std::atomic<bool>> run) {
@@ -677,13 +667,15 @@ namespace WMTS {
 			// for std::format printing in the window title
 			int x = 0;
 			
-			// prevent concurent access to shared resources
-			std::mutex guard;
-			guard.lock();
+			// prevent concurent access to thread_mp
+			thread_guard2.lock();
 
 			// search the thread map for the hwnd
 			auto found = thread_mp.find(CurrentThreadID);
-			guard.unlock();
+			
+			// safe to unlock
+			thread_guard2.unlock();
+
 			if (found != thread_mp.end()) {
 				while (*run) {
 					SetWindowTitle(std::format(L"Happy Window [{:*<{}}]", L'*', x + 1), found->second);
@@ -694,19 +686,46 @@ namespace WMTS {
 			}
 		}
 	private:
+		std::mutex main_thread_guard;
+		std::unique_lock<std::mutex> main_thread_lock;
+		std::condition_variable main_thread_cv;
+
+		//thread guard for BuildThreadPool()
+		std::mutex thread_guard4;
+
+		// thread guard for UpdateMapsAndResources()
+		std::mutex thread_guard3;
+
+		// thread guard in RunLogic
+		std::mutex thread_guard2;
+
+		// thread guard for CreateAWindow()
+		std::mutex thread_guard1;
+
 		// call this when a thread is exiting and is deleted
 		void UpdateMapsAndResources(std::thread::id CurrentThread) {
+			// No need to unlock, as std::lock_guard will unlock automatically
+			std::lock_guard<std::mutex> lock(thread_guard3);
+			
 			// update thread pool map
 			auto foundThread = thread_pool_mp.find(CurrentThread);
 			if (foundThread != thread_pool_mp.end()) {
-				// detach the thread
-				foundThread->second->detach();
+				if (foundThread->second->joinable()) {
+					// detach the thread
+					foundThread->second->detach();
 
-				// Now that the thread is detached, we can delete the std::thread object.
-				delete foundThread->second;
+					// Now that the thread is detached, we can delete the std::thread object.
+					delete foundThread->second;
 
-				// Erase the entry from the map to avoid accessing a dangling pointer later.
-				thread_pool_mp.erase(foundThread);
+					// Erase the entry from the map
+					thread_pool_mp.erase(foundThread);
+				}
+				else {
+					return;
+				}
+			}
+			else {
+				return;
 			}
 
 			// update thread map
@@ -729,6 +748,8 @@ namespace WMTS {
 				thread_mp.erase(foundHWND);
 			}
 
+			// signal the main thread to check if there is any threads still running
+			main_thread_cv.notify_one();
 		}
 
 		LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) override {
@@ -767,14 +788,7 @@ namespace WMTS {
 			ProcessMessage();
 
 			auto ThreadID = std::this_thread::get_id();
-
-			// Lock the mutex before updating the shared maps
-			std::mutex thread_pool_mutex;
-			thread_pool_mutex.lock();
-
 			UpdateMapsAndResources(ThreadID);
-
-			thread_pool_mutex.unlock();
 		}
 
 		int ProcessMessage() override {
@@ -811,8 +825,8 @@ namespace WMTS {
 		}
 
 		void CreateAWindow() override {
-			std::mutex guard;
-			guard.lock();
+			// No need to unlock, as std::lock_guard will unlock automatically
+			std::lock_guard<std::mutex> lock(thread_guard1);
 
 			HWND hwnd = nullptr;
 
@@ -834,8 +848,6 @@ namespace WMTS {
 				log.to_console();
 				log.to_output();
 				log.to_log_file();
-				
-				guard.unlock();
 				return;
 			}
 
@@ -856,8 +868,6 @@ namespace WMTS {
 
 			// show window, because it starts as hidden
 			ShowWindow(hwnd, SW_SHOWDEFAULT);
-
-			guard.unlock();
 		}
 	};
 }

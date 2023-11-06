@@ -14,7 +14,7 @@
 #include <format>
 #include <chrono>
 #include <atomic>
-
+#include <mutex>
 
 namespace WMTS {
 	// handles any file paths needed throughout this header
@@ -669,8 +669,15 @@ namespace WMTS {
 			// for std::format printing in the window title
 			int x = 0;
 			
+			// block concurrent access
+			thread_guard2.lock();
+
 			// search the thread map for the hwnd
 			auto found = thread_mp.find(CurrentThreadID);
+
+			// safe to open 
+			thread_guard2.unlock();
+
 			if (found != thread_mp.end()) {
 				while (*run) {
 					SetWindowTitle(std::format(L"Happy Window [{:*<{}}]", L'*', x + 1), found->second);
@@ -681,6 +688,12 @@ namespace WMTS {
 			}
 		}
 	private:
+		// thread guard in RunLogic
+		std::mutex thread_guard2;
+		
+		// thread guard for CreateAWindow()
+		std::mutex thread_guard1;
+
 		// thread to HWND map
 		std::unordered_map<std::thread::id, HWND> thread_mp;
 
@@ -725,6 +738,9 @@ namespace WMTS {
 		}
 
 		void CreateAWindow() override {
+			// No need to unlock, as std::lock_guard will unlock automatically
+			std::lock_guard<std::mutex> lock(thread_guard1);
+
 			HWND hwnd = nullptr;
 
 			hwnd = CreateWindowW(
