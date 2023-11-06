@@ -427,7 +427,7 @@ namespace WMTS {
 		// registers mWCEX window class
 		virtual void RegisterWindowClass() = 0;
 
-		virtual void CreateAWindow() = 0;
+		virtual bool CreateAWindow() = 0;
 
 		virtual void SetWindowTitle(std::wstring newTitle,HWND WindowHandle) = 0;
 
@@ -506,7 +506,7 @@ namespace WMTS {
 			}
 		}
 
-		void CreateAWindow() override {
+		bool CreateAWindow() override {
 			HWND hwnd = nullptr;
 
 			hwnd = CreateWindowW(
@@ -527,7 +527,7 @@ namespace WMTS {
 				log.to_console();
 				log.to_output();
 				log.to_log_file();
-				return;
+				return false;
 			}
 
 			// add to the vector of handles
@@ -541,6 +541,8 @@ namespace WMTS {
 
 			// show window, because it starts as hidden
 			ShowWindow(hwnd, SW_SHOWDEFAULT);
+
+			return true;
 		}
 
 		LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) override{
@@ -643,22 +645,6 @@ namespace WMTS {
 			main_thread_cv.wait(main_thread_lock, [this] {return thread_pool_mp.empty(); });
 		}
 
-		// fp: function pointer
-		// this_obj: this pointer
-		void BuildThreadPool(size_t NumberOfThreads, auto fp, auto this_obj) {
-			NumberOfThreads = std::clamp(NumberOfThreads, (size_t)0, (size_t)total_threads - 1);
-
-			// No need to unlock, as std::lock_guard will unlock automatically
-			std::lock_guard<std::mutex> lock(thread_guard4);
-
-			// build thread pool
-			for (size_t i{}; i < NumberOfThreads && thread_pool_mp.size() < total_threads; i++) {
-				// build map of thread_pool
-				auto thread = new std::thread(fp, this_obj);
-				thread_pool_mp.emplace(thread->get_id(), thread);
-			}
-		}
-		
 		void RunLogic(std::thread::id CurrentThreadID,std::shared_ptr<std::atomic<bool>> run) {
 			// Example code for showing functionality:
 			// Put any logic code here: 
@@ -686,6 +672,22 @@ namespace WMTS {
 			}
 		}
 	private:
+		// fp: function pointer
+		// this_obj: this pointer
+		void BuildThreadPool(size_t NumberOfThreads, auto fp, auto this_obj) {
+			NumberOfThreads = std::clamp(NumberOfThreads, (size_t)0, (size_t)total_threads - 1);
+
+			// No need to unlock, as std::lock_guard will unlock automatically
+			std::lock_guard<std::mutex> lock(thread_guard4);
+
+			// build thread pool
+			for (size_t i{}; i < NumberOfThreads && thread_pool_mp.size() < total_threads; i++) {
+				// build map of thread_pool
+				auto thread = new std::thread(fp, this_obj);
+				thread_pool_mp.emplace(thread->get_id(), thread);
+			}
+		}
+
 		std::mutex main_thread_guard;
 		std::unique_lock<std::mutex> main_thread_lock;
 		std::condition_variable main_thread_cv;
@@ -784,7 +786,11 @@ namespace WMTS {
 		std::unordered_map<std::thread::id, HWND> thread_mp;
 
 		void Run() {
-			CreateAWindow();
+			// if CreateAWindow fails we dont want the thread to continue
+			// it would cause problems in ProcessMessage()
+			if (!CreateAWindow())
+				return; // exit the run function
+			
 			ProcessMessage();
 
 			auto ThreadID = std::this_thread::get_id();
@@ -824,7 +830,7 @@ namespace WMTS {
 			return (int)msg.wParam;
 		}
 
-		void CreateAWindow() override {
+		bool CreateAWindow() override {
 			// No need to unlock, as std::lock_guard will unlock automatically
 			std::lock_guard<std::mutex> lock(thread_guard1);
 
@@ -848,7 +854,7 @@ namespace WMTS {
 				log.to_console();
 				log.to_output();
 				log.to_log_file();
-				return;
+				return false;
 			}
 
 			// add to the vector of handles
@@ -868,6 +874,8 @@ namespace WMTS {
 
 			// show window, because it starts as hidden
 			ShowWindow(hwnd, SW_SHOWDEFAULT);
+
+			return true;
 		}
 	};
 }

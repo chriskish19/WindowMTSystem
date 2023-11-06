@@ -425,7 +425,7 @@ namespace WMTS {
 		// registers mWCEX window class
 		virtual void RegisterWindowClass() = 0;
 
-		virtual void CreateAWindow() = 0;
+		virtual bool CreateAWindow() = 0;
 
 		virtual void SetWindowTitle(std::wstring newTitle,HWND WindowHandle) = 0;
 
@@ -504,7 +504,7 @@ namespace WMTS {
 			}
 		}
 
-		void CreateAWindow() override {
+		bool CreateAWindow() override {
 			HWND hwnd = nullptr;
 
 			hwnd = CreateWindowW(
@@ -525,7 +525,7 @@ namespace WMTS {
 				log.to_console();
 				log.to_output();
 				log.to_log_file();
-				return;
+				return false;
 			}
 
 			// add to the vector of handles
@@ -539,6 +539,8 @@ namespace WMTS {
 
 			// show window, because it starts as hidden
 			ShowWindow(hwnd, SW_SHOWDEFAULT);
+
+			return true;
 		}
 
 		LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) override{
@@ -698,7 +700,12 @@ namespace WMTS {
 		std::unordered_map<std::thread::id, HWND> thread_mp;
 
 		void Run() {
-			CreateAWindow();
+			// if CreateAWindow fails we dont want the thread to continue
+			// it would cause problems in ProcessMessage()
+			if (!CreateAWindow())
+				return; // exit the run function
+
+
 			ProcessMessage();
 		}
 
@@ -737,7 +744,7 @@ namespace WMTS {
 			return (int)msg.wParam;
 		}
 
-		void CreateAWindow() override {
+		bool CreateAWindow() override {
 			// No need to unlock, as std::lock_guard will unlock automatically
 			std::lock_guard<std::mutex> lock(thread_guard1);
 
@@ -761,7 +768,7 @@ namespace WMTS {
 				log.to_console();
 				log.to_output();
 				log.to_log_file();
-				return;
+				return false;
 			}
 
 			// add to the vector of handles
@@ -781,6 +788,8 @@ namespace WMTS {
 
 			// show window, because it starts as hidden
 			ShowWindow(hwnd, SW_SHOWDEFAULT);
+
+			return true;
 		}
 	};
 }
