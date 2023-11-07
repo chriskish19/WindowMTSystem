@@ -85,10 +85,10 @@ namespace WMTS {
 	
 	
 	
+
 // these macros are for the logger class
-#define WSTRINGIFY(x) L#x
-#define TOWSTRING(x) WSTRINGIFY(x)
-#define LOCATION std::wstring(L"Line: " TOWSTRING(__LINE__) L" File: " __FILE__)
+#define WMTS_WSTRINGIFY(x) L#x
+#define WMTS_LOCATION std::wstring(L"Line: " WMTS_WSTRINGIFY(__LINE__) L" File: " __FILE__)
 
 
 	// used in the logger class to classify errors
@@ -131,7 +131,7 @@ namespace WMTS {
 				LocalFree(errorMsgBuffer);
 			}
 			else {
-				logger log(L"Format message failed", Error::WARNING, LOCATION);
+				logger log(L"Format message failed", Error::WARNING, WMTS_LOCATION);
 				log.to_console();
 				log.to_output();
 				log.to_log_file();
@@ -156,7 +156,7 @@ namespace WMTS {
 		void to_log_file() {
 			// if logFile is not open send info to console and output window
 			if (!logFile.is_open()) {
-				logger log(L"failed to open logFile", Error::WARNING, LOCATION);
+				logger log(L"failed to open logFile", Error::WARNING, WMTS_LOCATION);
 				log.to_console();
 				log.to_output();
 			}
@@ -166,7 +166,7 @@ namespace WMTS {
 			
 			// if it fails to write mMessage to log.txt, log the fail to the console and output window
 			if (logFile.fail()) {
-				logger log(L"failed to write to log file", Error::WARNING, LOCATION);
+				logger log(L"failed to write to log file", Error::WARNING, WMTS_LOCATION);
 				log.to_console();
 				log.to_output();
 			}
@@ -180,7 +180,9 @@ namespace WMTS {
 	private:
 		// default initialization code for logger class
 		void initLogger() {
-			if (!Logger_init && SubSysWindows) {
+			// since any header could use a similar logger we need to guard agianst reintializing the console
+			// each time a logger is constructed
+			if (!Logger_init && SubSysWindows && GetConsoleWindow()==nullptr) {
 				AllocConsole();
 
 				// Redirect the CRT standard input, output, and error handles to the console
@@ -285,7 +287,7 @@ namespace WMTS {
 		std::wstring mMessage;
 
 		// code for outputting to a log file
-		inline static std::wstring logfilepath{ FilePaths::exePathW + L"log.txt" };
+		inline static std::wstring logfilepath{ FilePaths::exePathW + L"WMTSlog.txt" };
 		inline static std::wofstream logFile{logfilepath,std::ios::out};
 	};
 	
@@ -310,7 +312,7 @@ namespace WMTS {
 				mHeight = std::make_shared<UINT>(height);
 			}
 			else {
-				logger log(Error::WARNING, LOCATION);
+				logger log(Error::WARNING, WMTS_LOCATION);
 				log.to_console();
 				log.to_output();
 				log.to_log_file();
@@ -325,7 +327,7 @@ namespace WMTS {
 				mClientHeight = std::make_shared<UINT>(clientHeight);
 			}
 			else {
-				logger log(Error::WARNING, LOCATION);
+				logger log(Error::WARNING, WMTS_LOCATION);
 				log.to_console();
 				log.to_output();
 				log.to_log_file();
@@ -343,7 +345,7 @@ namespace WMTS {
 				*mHeight = height;
 			}
 			else {
-				logger log(Error::WARNING, LOCATION);
+				logger log(Error::WARNING, WMTS_LOCATION);
 				log.to_console();
 				log.to_output();
 				log.to_log_file();
@@ -358,7 +360,7 @@ namespace WMTS {
 				*mClientHeight = clientHeight;
 			}
 			else {
-				logger log(Error::WARNING, LOCATION);
+				logger log(Error::WARNING, WMTS_LOCATION);
 				log.to_console();
 				log.to_output();
 				log.to_log_file();
@@ -497,7 +499,7 @@ namespace WMTS {
 
 		void RegisterWindowClass() override {
 			if (!RegisterClassExW(&mWCEX)) {
-				logger log(Error::FATAL, LOCATION);
+				logger log(Error::FATAL, WMTS_LOCATION);
 				log.to_console();
 				log.to_output();
 				log.to_log_file();
@@ -521,7 +523,7 @@ namespace WMTS {
 				this);
 
 			if (!IsWindow(hwnd)) {
-				logger log(Error::FATAL, LOCATION);
+				logger log(Error::FATAL, WMTS_LOCATION);
 				log.to_console();
 				log.to_output();
 				log.to_log_file();
@@ -764,7 +766,7 @@ namespace WMTS {
 				this);
 
 			if (!IsWindow(hwnd)) {
-				logger log(Error::FATAL, LOCATION);
+				logger log(Error::FATAL, WMTS_LOCATION);
 				log.to_console();
 				log.to_output();
 				log.to_log_file();
