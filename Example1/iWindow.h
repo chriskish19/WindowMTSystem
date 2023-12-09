@@ -104,8 +104,8 @@ namespace WMTS {
 			initLogger();
 			initErrorType(type);
 
-			// mMessage is timestamped and has error type now add location to the end
-			mMessage += location;
+			// mMessage is timestamped and has error type now add location and the message(std::wstring s) to the end
+			mMessage += location + L" Message: " + s;
 		}
 
 		// log windows errors with this constructor
