@@ -1,26 +1,12 @@
 # WindowMTSystem
+Uses Microsoft's Win32 API to create multiple windows each with their own threads.
 
-Uses win32 API to create multiple windows each with their own threads.
-All of the code is defined in iWindow.h. To use include iWindow.h in a cpp file like main.cpp.
-Or Clone the repository and use Visual Studio 2022 to compile and run.
-
+## Getting Started:
+Clone the repository and use Visual Studio 2022 to compile and run.
 
 ## How to:
-### In main.cpp
-This code creates two windows, each window has its own logic thread and message loop thread. 
-
-```cpp
-#include "iWindow.h"
-
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow) {
-	WMTS::MTPlainWin32Window Window;
-	Window.ExecuteThreads(2);
-	return 0;
-}
-```
-
-### In a created header file CustomWindow.h:
-Create a custom window class with polymorphism:
+### Create a Custom Window Class:
+In a created header file CustomWindow.h
 ```cpp
 #include "iWindow.h"
 class MyCustomWindow: public WMTS::MTPlainWin32Window{
