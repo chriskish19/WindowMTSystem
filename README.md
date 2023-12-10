@@ -76,10 +76,27 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	return 0;
 }
 ```
+  
+
+## Future Goals:
+
+#### Small Improvements:
+1. Change the project to use CMAKE instead of relying on a visual studio solution.
+2. Remove class FilePaths and use C++17 filesystem instead.
+3. Add exception handling. Mark functions noexcept if they dont throw.
+4. Logger class should use const references instead of creating copies of strings, in the constructor.
+5. The way threads are kept track of could be cleaned up. The UpdateMapsAndResources() function is messy.
+6. Mark functions that don't modify the object as const.
+
+#### Large Additions:
+Note: These additions will eventually be implemented, but it may take a couple years.
+1. Write a DX12 Renderer that uses WMTS to handle window creation and rendering to, as an Example project.
+2. Write a cross-platform version of WMTS for Linux and MacOS.
+3. Write a cross-platform renderer Vulkan/OpenGL that uses the cross-platform version of WMTS, as an Example project.
+
+
 ## Info:
 #### See Example1 on how to implement dynamically creating windows on separate threads at run time.
 
 
-This is a work in progress, I am still learning how to use C++.  
-For myself I'll to be using it in my game engine with Direct X12 API.
-
+This is a work in progress, I am still learning how to use C++, OpenGL, Vulkan and DirectX.
