@@ -90,7 +90,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 ## Future Goals:
 
 #### Small Improvements:
-1. Change the project to use CMAKE instead of relying on a visual studio solution.
+1. ~~Change the project to use CMAKE instead of relying on a visual studio solution.~~
 2. Remove class FilePaths and use C++17 filesystem instead.
 3. Add exception handling. Mark functions noexcept if they dont throw.
 4. Logger class should use const references instead of creating copies of strings, in the constructor.
