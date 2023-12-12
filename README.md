@@ -2,7 +2,30 @@
 Uses Microsoft's Win32 API to create multiple windows each with their own threads.
 
 ## Getting Started:
-Clone the repository and use Visual Studio 2022 to compile and run.
+You will need installed on your system:
+1. [Git](https://git-scm.com/download/win)
+2. [CMake](https://cmake.org/)
+3. IDE(Integrated Development Enviroment such as [Visual Studio 2022](https://visualstudio.microsoft.com/vs/community/))
+
+In your terminal:
+```powershell
+# clone the repository
+git clone https://github.com/chriskish19/WindowMTSystem.git
+
+# navigate to the directory
+cd WindowMTSystem
+
+# Make a build folder
+mkdir build
+cd build
+
+# To build your IDE solution
+cmake ../
+
+# Compile the projects into executables
+cmake --build .
+```
+
 
 ## How to:
 ### Create a Custom Window Class:
