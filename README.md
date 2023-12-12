@@ -29,9 +29,9 @@ cmake --build .
 
 ## How to:
 ### Create a Custom Window Class:
-In a created header file CustomWindow.h
+In a created header file CustomWindow.hpp
 ```cpp
-#include "iWindow.h"
+#include "iWindow.hpp"
 class MyCustomWindow: public WMTS::MTPlainWin32Window{
 public:
 	MyCustomWindow(){
@@ -76,7 +76,7 @@ public:
 ```
 To use the custom window class:
 ```cpp
-#include "CustomWindow.h"
+#include "CustomWindow.hpp"
 // custom window definition here
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow) {
