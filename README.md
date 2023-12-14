@@ -91,11 +91,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
 #### Small Improvements:
 1. ~~Change the project to use CMAKE instead of relying on a visual studio solution.~~
-2. Remove class FilePaths and use C++17 filesystem instead.
-3. Add exception handling. Mark functions noexcept if they dont throw.
-4. Logger class should use const references instead of creating copies of strings, in the constructor.
-5. The way threads are kept track of could be cleaned up. The UpdateMapsAndResources() function is messy.
-6. Mark functions that don't modify the object as const.
+2. ~~Remove class FilePaths and use C++17 filesystem instead.~~
+3. ~~Add exception handling. Mark functions noexcept if they dont throw.~~
+4. ~~Logger class should use const references instead of creating copies of strings, in the constructor.~~
+5. ~~The way threads are kept track of could be cleaned up. The UpdateMapsAndResources() function is messy.~~
+6. ~~Mark functions that don't modify the object as const.~~
 
 #### Large Additions:
 Note: These additions will eventually be implemented, but it may take a couple years.
