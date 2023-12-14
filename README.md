@@ -2,13 +2,36 @@
 Uses Microsoft's Win32 API to create multiple windows each with their own threads.
 
 ## Getting Started:
-Clone the repository and use Visual Studio 2022 to compile and run.
+You will need installed on your system:
+1. [Git](https://git-scm.com/download/win)
+2. [CMake](https://cmake.org/)
+3. IDE(Integrated Development Enviroment such as [Visual Studio 2022](https://visualstudio.microsoft.com/vs/community/))
+
+In your terminal:
+```powershell
+# clone the repository
+git clone https://github.com/chriskish19/WindowMTSystem.git
+
+# navigate to the directory
+cd WindowMTSystem
+
+# Make a build folder
+mkdir build
+cd build
+
+# To build your IDE solution
+cmake ../
+
+# Compile the projects into executables
+cmake --build .
+```
+
 
 ## How to:
 ### Create a Custom Window Class:
-In a created header file CustomWindow.h
+In a created header file CustomWindow.hpp
 ```cpp
-#include "iWindow.h"
+#include "iWindow.hpp"
 class MyCustomWindow: public WMTS::MTPlainWin32Window{
 public:
 	MyCustomWindow(){
@@ -53,7 +76,7 @@ public:
 ```
 To use the custom window class:
 ```cpp
-#include "CustomWindow.h"
+#include "CustomWindow.hpp"
 // custom window definition here
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow) {
@@ -67,7 +90,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 ## Future Goals:
 
 #### Small Improvements:
-1. Change the project to use CMAKE instead of relying on a visual studio solution.
+1. ~~Change the project to use CMAKE instead of relying on a visual studio solution.~~
 2. Remove class FilePaths and use C++17 filesystem instead.
 3. Add exception handling. Mark functions noexcept if they dont throw.
 4. Logger class should use const references instead of creating copies of strings, in the constructor.
