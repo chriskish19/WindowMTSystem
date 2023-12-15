@@ -928,6 +928,10 @@ namespace WMTS {
 			// Update maps and resources
 			// much cleaner now and thread safe
 			mResources.Update(ThreadID);
+
+			// tell the waiting main thread to check if there is still threads in the thread pool map
+			// if the map is empty its safe to exit
+			main_thread_cv.notify_one();
 		}
 
 		int ProcessMessage() override {
