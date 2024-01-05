@@ -1,7 +1,7 @@
 # WindowMTSystem
 Uses Microsoft's Win32 API to create multiple windows each with their own threads.
 
-## Getting Started:
+# Build From Source Code:
 You will need installed on your system:
 1. [Git](https://git-scm.com/download/win)
 2. [CMake](https://cmake.org/)
@@ -26,8 +26,27 @@ cmake ../
 cmake --build .
 ```
 
+# Getting Started
+## Download and Run Binaries
+Go to releases page and download v1.0-d.exe and example1-d.exe. Double click to run.
+Or In your terminal:
+```powershell
+# Example: navigate to where you saved the files
+cd C:/users/downloads
 
-## How to:
+# run v1.0-d.exe
+.\v1.0-d
+
+# run example1-d.exe
+.\example1-d
+
+```
+
+When running example1-d, use your mouse and navigate to the top menu bar click on "File" then "New" and "Window" and a new window will appear. It is running on a seperate thread, notice when you move the window the title keeps changing and does not freeze. You can create as many windows as your system memory allows for.
+
+
+
+# How to:
 ### Create a Custom Window Class:
 In a created header file CustomWindow.hpp
 ```cpp
@@ -87,25 +106,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 ```
   
 
-## Future Goals:
-
-#### Small Improvements:
-1. ~~Change the project to use CMAKE instead of relying on a visual studio solution.~~
-2. ~~Remove class FilePaths and use C++17 filesystem instead.~~
-3. ~~Add exception handling. Mark functions noexcept if they dont throw.~~
-4. ~~Logger class should use const references instead of creating copies of strings, in the constructor.~~
-5. ~~The way threads are kept track of could be cleaned up. The UpdateMapsAndResources() function is messy.~~
-6. ~~Mark functions that don't modify the object as const.~~
-
+# Future Goals:
 #### Large Additions:
-Note: These additions will eventually be implemented, but it may take a couple years.
 1. Write a DX12 Renderer that uses WMTS to handle window creation and rendering to, as an Example project.
 2. Write a cross-platform version of WMTS for Linux and MacOS.
 3. Write a cross-platform renderer Vulkan/OpenGL that uses the cross-platform version of WMTS, as an Example project.
 
-
-## Info:
+# Info:
 #### See Example1 on how to implement dynamically creating windows on separate threads at run time.
-
 
 This is a work in progress, I am still learning how to use C++, OpenGL, Vulkan and DirectX.
