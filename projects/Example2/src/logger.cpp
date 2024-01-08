@@ -46,6 +46,58 @@ WMTS::logger::logger(Error type, const std::source_location& location, DWORD Win
     mMessage += win32error_str;
 }
 
+WMTS::logger::logger(Error type, HRESULT hr, ID3DBlob *dx_error, const std::source_location &location)
+:m_location(location)
+{
+    initLogger();
+    time_stamp();
+    initErrorType(type);
+    location_stamp();
+
+    // object for decoding HRESULT errors
+    _com_error com_error(hr);
+
+    // HRESULT error string
+    std::wstring wcom_error_str{ com_error.ErrorMessage() };
+
+    // DirectX error strings
+    const char* ccp_error_str{};
+    std::string dx_error_str{};
+    std::wstring wdx_error_str{ L"dx_error is nullptr" };
+    if (dx_error) {
+        ccp_error_str = static_cast<const char*>(dx_error->GetBufferPointer());
+        dx_error_str = ccp_error_str;
+
+        // DirectX wide error string
+        wdx_error_str = std::wstring(dx_error_str.begin(), dx_error_str.end());
+    }
+
+    // add for readability
+    wdx_error_str = L"DirectX Error: " + wdx_error_str + L"|";
+    wcom_error_str = L"HRESULT Error: " + wcom_error_str + L"|";
+
+    mMessage += wdx_error_str + wcom_error_str;
+}
+
+WMTS::logger::logger(Error type, HRESULT hr, const std::source_location& location)
+:m_location(location)
+{
+    initLogger();
+    time_stamp();
+    initErrorType(type);
+    location_stamp();
+    
+    // object for decoding HRESULT errors
+    _com_error com_error(hr);
+
+    // HRESULT error string
+    std::wstring wcom_error_str{ com_error.ErrorMessage() };
+
+    // for readability
+    wcom_error_str = L"HRESULT Error: " + wcom_error_str + L"|";
+
+    mMessage += wcom_error_str;
+}
 
 void WMTS::logger::time_stamp(){
     //Geting Current time

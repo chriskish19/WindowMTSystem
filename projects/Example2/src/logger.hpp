@@ -7,6 +7,8 @@
 #include <iostream>
 #include <mutex>
 #include <fstream>
+#include "D3DCommon.h"
+#include <comdef.h>
 
 
 
@@ -32,6 +34,12 @@ namespace WMTS{
 
 		// log windows errors with this constructor
 		logger(Error type, const std::source_location& location = std::source_location::current(), DWORD Win32error = GetLastError());
+
+		// log dx12 errors with this constructor
+		logger(Error type, HRESULT hr, ID3DBlob* dx_error, const std::source_location& location = std::source_location::current());
+
+		// log dx12 HRESULT errors with this constructor
+		logger(Error type, HRESULT hr, const std::source_location& location = std::source_location::current());
 
 		// output mMessage to console
 		void to_console() const;
