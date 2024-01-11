@@ -1,6 +1,8 @@
 #pragma once
 #include "logger.hpp"
 #include "iDevice.hpp"
+#include <chrono>
+#include "Camera.hpp"
 
 
 // load direct x library files
@@ -23,5 +25,17 @@ namespace WMTS{
 		void Resize(UINT width, UINT height) override;
 		void DestroyFrameBuffer() override;
 		void SetupSwapChain(UINT width, UINT height) override;
+		
+
+		Vertex mVertexBufferData[3] = {{{1.0f, -1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+                                      {{-1.0f, -1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+                                      {{0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}}};
+
+		uint32_t mIndexBufferData[3] = {0, 1, 2};
+
+		std::chrono::time_point<std::chrono::steady_clock> m_tStart, m_tEnd;
+		float mElapsedTime = 0.0f;
+		Camera m_MainView;
+		HWND m_WindowHandle;
 	};
 }

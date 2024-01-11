@@ -1,6 +1,6 @@
 #include "Renderer.hpp"
 
-WMTS::dx12::dx12(HWND WindowHandle, UINT WindowWidth, UINT WindowHeight)
+WMTS::dx12::dx12(HWND WindowHandle, UINT WindowWidth, UINT WindowHeight):m_WindowHandle(WindowHandle)
 {
 #if defined(_DEBUG)
 			LoadDebugInterface();
@@ -206,4 +206,43 @@ void WMTS::dx12::SetupSwapChain(UINT width, UINT height)
     mViewport.Height = static_cast<float>(mHeight);
     mViewport.MinDepth = .1f;
     mViewport.MaxDepth = 1000.f;
+
+    uboVS.projectionMatrix = m_MainView.GetProjectionMatrix();
+
+	// View Matrix (Translate)
+	uboVS.viewMatrix = m_MainView.GetViewMatrix();
+
+	// Model Matrix (Identity)
+	uboVS.modelMatrix = DirectX::XMMatrixIdentity();
+
+    if (mSwapChain != nullptr)
+	{
+		mSwapChain->ResizeBuffers(backbufferCount, mWidth, mHeight,
+			DXGI_FORMAT_R8G8B8A8_UNORM, 0);
+	}
+	else {
+		DXGI_SWAP_CHAIN_DESC1 swapchainDesc{};
+		swapchainDesc.BufferCount = backbufferCount;
+		swapchainDesc.Width = width;
+		swapchainDesc.Height = height;
+		swapchainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		swapchainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+		swapchainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+		swapchainDesc.SampleDesc.Count = 1;
+
+		IDXGISwapChain1* swapchain = nullptr;
+		{
+			HRESULT debug = mFactory->CreateSwapChainForHwnd(mCommandQueue.Get(), m_WindowHandle, &swapchainDesc, nullptr, nullptr, &swapchain);
+			if (FAILED(debug)) {
+				logger log(Error::FATAL, debug);
+				log.to_console();
+				log.to_output();
+			}
+			else {
+				mSwapChain = static_cast<IDXGISwapChain3*>(swapchain);
+			}
+		}
+	}
+
+	mFrameIndex = mSwapChain->GetCurrentBackBufferIndex();
 }
